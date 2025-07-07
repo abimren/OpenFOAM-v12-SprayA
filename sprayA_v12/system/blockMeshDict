@@ -1,0 +1,88 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  12
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+convertToMeters 0.001;
+
+ vertices
+ (
+    (0 0 0)				// point 0
+    (15 0.654914143627681 0)		// point 1
+    (15 -0.654914143627681 0) 	// point 2
+    (0 0 108)				// point 3
+    (15 0.654914143627681 108)	// point 4
+    (15 -0.654914143627681 108) 	// point 5
+    (54 2.357690917059651 0)		// point 6
+    (54 -2.357690917059651 0)		// point 7
+    (54 2.357690917059651 108)	// point 8
+    (54 -2.357690917059651 108)	// point 9
+ );
+
+ blocks
+ (
+    hex (0 2 1 0 3 5 4 3) (30 1 200) simpleGrading (4 1 2)
+    hex (2 7 6 1 5 9 8 4) (20 1 200) simpleGrading (5 1 2)
+ );
+
+ edges
+ (
+ );
+
+ boundary
+ (
+    walls
+    {
+        type wall;
+        faces
+        (
+            (0 1 2 0)
+            (1 6 7 2)
+            (6 8 9 7)
+            (4 8 9 5)
+            (3 4 5 3)
+        );
+    }
+    sideA
+    {
+        type wedge;
+        faces
+        (
+            (0 1 4 3)
+            (1 6 8 4)
+        );
+    }
+    sideB
+    {
+        type wedge;
+        faces
+        (
+            (0 2 5 3)
+            (2 7 9 5)
+        );
+    }
+    centerPlane
+    {
+        type empty;
+        faces
+        (
+            (0 3 3 0)
+        );
+    }
+ );
+
+ mergePatchPairs
+ (
+ );
+
+// ************************************************************************* //

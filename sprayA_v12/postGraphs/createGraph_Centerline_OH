@@ -1,0 +1,29 @@
+#!/bin/sh
+
+if ! which gnuplot > /dev/null 2>&1
+then
+    echo "gnuplot not found - skipping graph creation" >&2
+    exit 1
+fi
+
+gnuplot<<EOF
+    set terminal pngcairo dashed enhanced  font 'arial,16' size 800,600
+    set output "plotCenterline_OH.png"
+    #set title "Sandia Flame A"
+    set xlabel "Distance [m]" font "arial,16"
+    set ylabel "OH" font "arial,16"
+    set grid
+    #set key box center below
+    set key box right top
+    #set xrange [0:0.02]
+    #set yrange [750:2350]
+    #set ytics 250
+    set mxtics 5
+    set mytics 5
+    plot \
+        "RCVODECenterLine_T_OH_CO.xy" u 1:3 t "OFv9Ref-Centerline" w l lt 1 lc 2 lw 3,\
+        "../postProcessing/CenterLine/0.003/line.xy" u 1:7 t "OFv12-Centerline" w p lt 1 lc 2 pt 6 ps 1.5
+EOF
+
+#------------------------------------------------------------------------------
+

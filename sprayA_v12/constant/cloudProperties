@@ -1,0 +1,201 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  12
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      cloudProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+type        sprayCloud;
+
+cpuLoad     off; //true;
+
+solution
+{
+    coupled         true;
+    transient       yes;
+    cellValueSourceCorrection on;
+    maxCo           0.3;
+
+    sourceTerms
+    {
+        schemes
+        {
+            rho             explicit 1;
+            U               explicit 1;
+            Yi              explicit 1;
+            h               explicit 1;
+            radiation       explicit 1;
+        }
+    }
+
+    interpolationSchemes
+    {
+        rho             cell;
+        U               cellPoint;
+        mu              cell;
+        T               cell;
+        Cp              cell;
+        kappa           cell;
+        p               cell;
+    }
+
+    integrationSchemes
+    {
+        U               Euler;
+        T               analytical;
+    }
+}
+
+
+constantProperties
+{
+    T0              373.0;
+    rho0            1e300;//663.28; not being used with liquidEvaporationBoil;
+    Cp0             1e300;//2435.64;
+    constantVolume  false;
+}
+
+
+subModels
+{
+    particleForces
+    {
+        sphereDrag;
+    }
+
+    injectionModels
+    {
+        model1
+        {
+            type            coneInjection;
+            SOI             0;
+            massTotal       2.107765E-07; // mass for 5 deg sector
+            uniformParcelSize volume;
+            injectionMethod disc;
+            flowType        flowRateAndDischarge;
+            dInner          0;
+            dOuter          1.0701e-05; // diameter for 5 deg sector
+            duration        6.00e-03;
+            position        (0.0004 0.0000 0.0004);
+            direction       (0.0000 0.0000 1.0000);
+            parcelsPerSecond 5.00e07;
+            #include "flowRate.foam"
+            Cd              constant 0.89;
+
+            thetaInner      constant 0.0;
+            thetaOuter      constant 6.3;
+
+            sizeDistribution
+            {
+                type        RosinRammler;
+                Q               3;
+                min             1e-6;
+                max             90.8e-6;
+                d               90.8e-6;
+                n               3.5;
+            }
+        }
+    }
+
+    dispersionModel none;
+
+    patchInteractionModel standardWallInteraction;
+
+    heatTransferModel RanzMarshall;
+
+    compositionModel singlePhaseMixture;
+
+    phaseChangeModel liquidEvaporationBoil;
+
+    surfaceFilmModel none;
+
+    atomisationModel blobInjection;
+
+    breakupModel    ReitzDiwakar; // ReitzKHRT;
+
+    stochasticCollisionModel none;
+
+    radiation       off;
+
+    standardWallInteractionCoeffs
+    {
+        type            rebound;
+    }
+
+    RanzMarshallCoeffs
+    {
+        BirdCorrection  true;
+    }
+
+    singlePhaseMixtureCoeffs
+    {
+        phases
+        (
+            liquid
+            {
+                C12H26               1;
+            }
+        );
+    }
+
+    liquidEvaporationBoilCoeffs
+    {
+        enthalpyTransfer enthalpyDifference;
+
+        activeLiquids    ( C12H26 );
+    }
+    
+    blobInjectionCoeffs
+    {
+        VariableLBU     1.0;
+        coeffBU         10.28998;
+        injDiameter     90.8e-06;  
+    }
+
+    ReitzDiwakarCoeffs
+    {
+        Cbag            6;          // Critical Weber Number for Bag
+        Cb              0.785;      //3.1416; Time Factor for Bag Breakup
+        Cstrip          0.5;        //0.6; Weber Number Factor for Stripping
+        Cs              9.0;         //18.0; Time Factor for Stripping
+    }
+
+
+    ReitzKHRTCoeffs
+    {
+        B0              0.61;
+        B1              15; //40;
+        Ctau            1;
+        CRT             0.1;
+        msLimit         0.03; //0.2;
+        WeberLimit      6;
+        VariableLBU     1.98; //1.5;
+        coeffBU         10.28998;
+        injDiameter     90.8e-06;  
+    }
+
+    TABCoeffs
+    {
+        y0              0;
+        yDot0           0;
+        Cmu             10;
+        Comega          8;
+        WeCrit          12;
+    }
+}
+
+
+cloudFunctions
+{}
+
+
+// ************************************************************************* //
