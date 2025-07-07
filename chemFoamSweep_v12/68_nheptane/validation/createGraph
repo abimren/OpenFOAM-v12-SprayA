@@ -1,0 +1,29 @@
+#!/bin/sh
+
+if ! which gnuplot > /dev/null 2>&1
+then
+    echo "gnuplot not found - skipping graph creation" >&2
+    exit 1
+fi
+
+gnuplot<<EOF
+    set terminal pngcairo dashed enhanced  font 'arial,16' size 800,600
+    set output "plot4.png"
+    set title "0-D Homogeneous Stoichiometric n-heptane/air mixture\n at 50 atm/800 K (68 species n-heptane mechanism)"
+    set xlabel "Time [s]" font "arial,16"
+    set ylabel "Temperature [K]" font "arial,16"
+    set grid
+    #set key box right bottom
+    set key box left top
+    set xrange [0:0.001]
+    set yrange [750:2750]
+    set ytics 250
+    set mxtics 5
+    set mytics 5
+    plot \
+        "../chemFoam.out" u 1:2 t "seulex - dynamic {/Symbol D}t_{CFD}" w p lt 1 pt 6 ps 1.5,\
+        "ct_dvode.txt" u 1:2 t "CK-Ref" w l lt -1 lw 3
+EOF
+
+#------------------------------------------------------------------------------
+
