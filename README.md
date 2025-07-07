@@ -60,8 +60,9 @@ Demonstration of a 2-D axisymmetric Spray-A combustion simulation shown in ***Im
 
   For a very large mechanism (e.g., 7171 species C20 mechanism), one may want to test with 4-8 threads and compare with the performance of KLU sparse solver (Authors call Clark Kent LU solver). From these words, one should not interpret that the problem is being solved only by using high-performance linear algebra. There are so many important method details coded in the custom libraries and one may want to read ***Imren and Haworth (2016)[^2]*** 
      
- - After loading *.bashrc* (type '*source ~/.bashrc*'), change directory to *chemFoamSweep_v12*. 10 publicly available chemical mechanisms will be tested. Note that these mechanisms were examined using ***ThermoRefit[^3]*** (highly recommended).
- - Change directory, for example, to '*654_nheptane*'. Open '*constant/chemistryProperties*' file and see that ODE solver was set to 'seulexKLU'. Open '*system/controlDict*' file and see the '*application     my_chemFoam;*' line. 
+ - After loading *.bashrc* (type '*source ~/.bashrc*'), change directory to *chemFoamSweep_v12*. 10 publicly available chemical mechanisms is tested. Note that these mechanisms were already examined using ***ThermoRefit[^3]*** (highly recommended).
+ - Change directory, for example, to '*654_nheptane*'. Open '*constant/chemistryProperties*' file and see that ODE solver was set to '*seulexKLU*'. Open '*system/controlDict*' file and see the '*application     my_chemFoam;*' line. *my_chemFoam* solver uses custom solvers named: '*seulexDNS*' and '*seulexKLU*'. *DNS* refers to OpenBLAS dense solver. *KLU* refers to SuiteSparse-KLU sparse solver. Type *my_chemFoam* or '*./Allrun*'and hit the run. Compare with the results given in *logs* and *validation* directories. If one wants to compare with the original OpenFOAM solver, '*chemFoam' solver with '*seulex*' selection must be used.
+ -     
 
 
 [^1]: [Imren, A.: A Detailed Error Quantification Analysis of Extrapolation-Based Stiff ODE
