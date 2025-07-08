@@ -7,7 +7,7 @@ Demonstration of a 2-D axisymmetric Sandia ECN Spray-A combustion simulation sho
 - Install the binary version of OpenFOAM v12 (for a quick test) as instructed in https://openfoam.org/download/12-ubuntu/ .
 - Make sure that *pitzDailySteady* tutorial case is working.
 - Check if *.bashrc* file was loaded properly. Type: '*echo $FOAM_USER_APPBIN*' and '*echo $FOAM_USER_LIBBIN*'. If these directories do not exist, create using '*mkdir -p $FOAM_USER_APPBIN $FOAM_USER_LIBBIN*' command.
-- Copy files in *bin* and *lib* directories of this repository to *$FOAM_USER_APPBIN* and *$FOAM_USER_LIBBIN*, respectively. Change directory to *$FOAM_USER_APPBIN* and type '_chmod 755 *_'. Repeat for the files in *$FOAM_USER_LIBBIN*. Make sure that '*which my_chemFoam*' command addresses the correct path. At this point, before testing '*my_chemFoam*' solver, first we need to install some linear algebra packages: SuiteSparse and OpenBLAS. These are going to be used in the chemistry ODE integration.
+- Copy files in *bin* and *lib* directories of this repository to *$FOAM_USER_APPBIN* and *$FOAM_USER_LIBBIN*, respectively. Change directory to *$FOAM_USER_APPBIN* and type '_chmod 755 *_'. Repeat for the files in *$FOAM_USER_LIBBIN*. Make sure that '*which my_chemFoam*' command addresses the correct path. At this point, before testing '*my_chemFoam*' solver, first we need to install some linear algebra packages: SuiteSparse and OpenBLAS. They are going to be used in the chemistry ODE integration.
 - These pre-compiled packages are available in Ubuntu. Installing available packages is more convenient and easier than compiling them. Type:
 
   <div align="center">
