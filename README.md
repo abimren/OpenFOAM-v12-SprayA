@@ -2,7 +2,7 @@
 #### author: abdurrahman.imren @ WA, USA Jul 2025
 Demonstration of a 2-D axisymmetric Sandia ECN Spray-A combustion simulation shown in ***Imren (2022)[^1]***. Given examples in this repository use custom chemistryModel, lagrangianParcel, multicomponentFluid and ODE libraries. Examples can be easily tested on a modest Windows laptop using WSL Ubuntu 24.04. Windows WSL is a convenient platform (one can install multiple Linux distributions on the same machine) and custom libraries in this repo were compiled on Ubuntu 24.04. There are several steps to complete (highly recommended) before proceeding with the Spray-A case. Here is a fresh installation streamline:
 - Open a Windows terminal. Type '*wsl -l -o*' to see the list of valid Linux distributions.
-- Install Ubuntu 24.04: '*wsl --install -d Ubuntu-24.04 --name  Ubuntu-24.04-LTS*'. If already installed, check the steps regarding with SuiteSparse and OpenBLAS installation (Do not attempt to install on top of existing Ubuntu 24.04).    
+- Install Ubuntu 24.04: '*wsl --install -d Ubuntu-24.04 --name  Ubuntu-24.04-LTS*'. If already installed, check the steps regarding with SuiteSparse and OpenBLAS installation (Do not attempt to reinstall on top of existing Ubuntu 24.04).    
 - From Windows terminal drop-down menu located at the top bar, select Ubuntu-24.04-LTS.
 - Install the binary version of OpenFOAM v12 (for a quick test) as instructed in https://openfoam.org/download/12-ubuntu/ .
 - Make sure that *pitzDailySteady* tutorial case is working.
