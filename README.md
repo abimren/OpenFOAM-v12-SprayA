@@ -1,14 +1,14 @@
 # OpenFOAM-v12-SprayA
 #### author: abdurrahman.imren @ WA, USA Jul 2025
-Demonstration of a 2-D axisymmetric Spray-A combustion simulation shown in ***Imren (2022)[^1]***. Given examples in this repository use custom chemistryModel, lagrangianParcel, multicomponentFluid and ODE libraries. Examples can be easily tested on a modest Windows laptop using WSL Ubuntu 24.04. There are several steps to be done (highly recommended) before proceeding with the Spray-A case. A tested installation streamline (Windows WSL is a convenient platform - one can install multiple Linux distributions on the same machine):
-- Open a Windows terminal. Type '*wsl -l -o*' to see the list of valid Linux distributions
-- Install Ubuntu 24.04: '*wsl --install -d Ubuntu-24.04 --name  Ubuntu-24.04-LTS*'
-- From Windows terminal drop-down menu located at the top bar, select Ubuntu-24.04-LTS
-- Install the binary version of OpenFOAM v12 (for a quick test) as instructed in https://openfoam.org/download/12-ubuntu/
-- Make sure that *pitzDailySteady* tutorial case worked
-- Check *.bashrc* was loaded properly. Type: '*echo $FOAM_USER_APPBIN*' and '*echo $FOAM_USER_LIBBIN*'. If these directories do not exists, create using: '*mkdir -p $FOAM_USER_APPBIN $FOAM_USER_LIBBIN*'
-- Copy files in *bin* and *lib* directories of this repository to *$FOAM_USER_APPBIN* and *$FOAM_USER_LIBBIN*, respectively. '*which my_chemFoam*' command should address the correct path. At this point, before testing '*my_chemFoam*' solver, first we need to install some linear algebra packages for the chemistry ODE integration: SuiteSparse and OpenBLAS.
-- These pre-compiled linear algebra packages are available in Ubuntu to download and install. Type:
+Demonstration of a 2-D axisymmetric Sandia ECN Spray-A combustion simulation shown in ***Imren (2022)[^1]***. Given examples in this repository use custom chemistryModel, lagrangianParcel, multicomponentFluid and ODE libraries. Examples can be easily tested on a modest Windows laptop using WSL Ubuntu 24.04. Windows WSL is a convenient platform (one can install multiple Linux distributions on the same machine) and custom libraries in this repo were compiled on Ubuntu 24.04. There are several steps to follow (highly recommended) before proceeding with the Spray-A case. Here is a fresh installation streamline:
+- Open a Windows terminal. Type '*wsl -l -o*' to see the list of valid Linux distributions.
+- Install Ubuntu 24.04: '*wsl --install -d Ubuntu-24.04 --name  Ubuntu-24.04-LTS*'.
+- From Windows terminal drop-down menu located at the top bar, select Ubuntu-24.04-LTS.
+- Install the binary version of OpenFOAM v12 (for a quick test) as instructed in https://openfoam.org/download/12-ubuntu/ .
+- Make sure that *pitzDailySteady* tutorial case is working.
+- Check if *.bashrc* file was loaded properly. Type: '*echo $FOAM_USER_APPBIN*' and '*echo $FOAM_USER_LIBBIN*'. If these directories do not exist, create using '*mkdir -p $FOAM_USER_APPBIN $FOAM_USER_LIBBIN*' command.
+- Copy files in *bin* and *lib* directories of this repository to *$FOAM_USER_APPBIN* and *$FOAM_USER_LIBBIN*, respectively. Change directory to *$FOAM_USER_APPBIN* and type '_chmod 755 *_'. Repeat for the files in *$FOAM_USER_LIBBIN*. Make sure that '*which my_chemFoam*' command addresses the correct path. At this point, before testing '*my_chemFoam*' solver, first we need to install some linear algebra packages: SuiteSparse and OpenBLAS. These are going to be used in the chemistry ODE integration.
+- These pre-compiled packages are available in Ubuntu. Installing available packages is more convenient and easier than compiling them. Type:
 
   <div align="center">
   <em>apt list --installed | grep -i libsuitesparse*</em>
@@ -20,13 +20,13 @@ Demonstration of a 2-D axisymmetric Spray-A combustion simulation shown in ***Im
   <em>dpkg -L libsuitesparse-dev</em>
   </div>
 
-  command. Make sure that SuiteSparse was installed in '*/usr/lib/x86_64-linux-gnu/*' (For example, see that '*/usr/lib/x86_64-linux-gnu/libklu.so*' exists). We will repeat the same steps for OpenBLAS installation. Type '*apt list | grep openblas**'. See that OpenBLAS was not installed by default. Type:
+  command. Make sure that SuiteSparse was installed in '*/usr/lib/x86_64-linux-gnu/*' (For example, see that '*/usr/lib/x86_64-linux-gnu/libklu.so*' line exists). We will repeat similar steps for OpenBLAS installation. Type '*apt list | grep openblas**'. See that OpenBLAS was not installed by default. Type:
 
   <div align="center">
   <em>update-alternatives --list liblapack.so.3-x86_64-linux-gnu</em>
   </div>
   
-  This command shows the available LAPACK library in the system:'*/usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3*'. We are going to replace default LAPACK and BLAS with those of OpenBLAS. Type:
+  This command lists the available LAPACK libraries in the system:'*/usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3*'. We are going to replace the default LAPACK and BLAS with those of OpenBLAS. Type:
 
   <div align="center">
   <em>sudo apt install libopenblas-dev</em>
@@ -38,7 +38,7 @@ Demonstration of a 2-D axisymmetric Spray-A combustion simulation shown in ***Im
   <em>'update-alternatives --list liblapack.so.3-x86_64-linux-gnu</em>
   </div>
 
-  We see that OpenBLAS was installed to:
+  Notice that OpenBLAS was installed. Output:
 
   <div align="center">
   <em>/usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3</em>
@@ -46,7 +46,7 @@ Demonstration of a 2-D axisymmetric Spray-A combustion simulation shown in ***Im
   <em>/usr/lib/x86_64-linux-gnu/openblas-pthread/liblapack.so.3</em>
   </div>
 
-  Check that system is using OpenBLAS LAPACK (i.e., link currently points to /usr/lib/x86_64-linux-gnu/openblas-pthread/liblapack.so.3):
+  Check that the system is using OpenBLAS package (i.e., link currently points to '*/usr/lib/x86_64-linux-gnu/openblas-pthread/liblapack.so.3*'):
 
   <div align="center">
   <em>update-alternatives --display liblapack.so.3-x86_64-linux-gnu</em>
@@ -58,11 +58,12 @@ Demonstration of a 2-D axisymmetric Spray-A combustion simulation shown in ***Im
   <em>export OPENBLAS_NUM_THREADS=1</em>
   </div>
 
-  For a very large mechanism (e.g., 7171 species C20 mechanism), one may want to test with 4-8 threads and compare with the performance of KLU sparse solver (Authors call Clark Kent LU solver). From these words, one should not interpret that the problem is being solved only by using high-performance linear algebra. There are so many important method details coded in the custom libraries and one may want to read ***Imren and Haworth (2016)[^2]*** 
+  For a very large mechanism (e.g., 7171 species C20 mechanism), one may want to test with 4-8 threads and compare with the performance of KLU sparse solver (Developers call Clark Kent LU solver). From these words, one should not interpret that the problem is being solved only by using high-performance linear algebra. There are so many important method details coded in the custom libraries and one may want to read ***Imren and Haworth (2016)[^2]*** 
      
- - After loading *.bashrc* (type '*source ~/.bashrc*'), change directory to *chemFoamSweep_v12*. 10 publicly available chemical mechanisms are tested. Note that these mechanisms were already examined using ***ThermoRefit[^3]*** (highly recommended - Note that OpenFOAM chemistry input looks like as of ***CHEMKIN[^4]*** but not exactly the same).
- - Change directory, for example, to '*654_nheptane*'. Open '*constant/chemistryProperties*' file and see that ODE solver was set to '*seulexKLU*'. Open '*system/controlDict*' file and see the '*application     my_chemFoam;*' line. '*my_chemFoam*' solver uses custom ODE solvers named: '*seulexDNS*' and '*seulexKLU*'. '*DNS*' refers to OpenBLAS dense solver. '*KLU*' refers to SuiteSparse-KLU sparse solver. Type '*my_chemFoam*' or '*./Allrun*' and hit the enter. Compare with the results given in *mylogs* and *validation* directories. If one wants to compare with the original OpenFOAM solver, '*chemFoam*' solver with '*seulex*' selection must be used. Solver performance can also be compared with commercial software and other open-source software Cantera(https://www.cantera.org/).
- - Change directory to '*sprayA_v12*'. Open '*constant/chemistryProperties*' file and see that ODE solver was set to '*seulexDNS*'. Recall that efficient dense solvers can be faster than sparse solvers for small size chemical mechanisms. Open '*system/controlDict*' file and see the '*solver mymulticomponentFluid;*' line. This is a custom library being called by '*foamRun*' solver. '*mymulticomponentFluid*' module is linked with custom *libchemistryModel.so,  liblagrangianParcel.so* and *libmyODE.so* libraries. Open '*system/decomposeParDict*' file and see that *simple* decomposer with 8 subdomains selection. If system does not have 8 physical cores, adjust accordingly. Open '*constant/cloudProperties*' and study the *injectionModels* key. See the *atomisationModel* was set to *blobInjection*. This is a custom implementation and plays crucial role to match with experimental liquid/vapor penetration. Secondary breakup model is *ReitzDiwakar*. Type '*Allrun-parallel*' and hit enter. OpenFOAM-v12 will sample results using the input given in *functions* file in *system* directory. Simulation (8e-3 s) should take ~9000-10000 s with 8 processors. Check plots in *postGraphs* directory. There reference results are from previous OpenFOAM-v9 simulation using CVODE-ATOL1e-20 and RTOL1e-12.
+ - After re-loading *.bashrc* (type '*source ~/.bashrc*'), change directory to *chemFoamSweep_v12*. Ten publicly available chemical mechanisms are tested. Note that these mechanisms were already examined using ***ThermoRefit[^3]*** (highly recommended - Note that OpenFOAM chemistry input looks like as of ***CHEMKIN[^4]*** but it is not exactly the same).
+ - Change directory, for example, to '*654_nheptane*'. Open '*constant/chemistryProperties*' file and see that ODE solver was set to '*seulexKLU*'. Open '*system/controlDict*' file and see the '*application     my_chemFoam;*' line. '*my_chemFoam*' solver uses custom ODE solvers named: '*seulexDNS*' and '*seulexKLU*'. '*DNS*' refers to OpenBLAS dense solver. '*KLU*' refers to SuiteSparse-KLU sparse solver. Type '*my_chemFoam*' or '*./Allrun*' and hit the enter. Compare with the results given in *mylogs* and *validation* directories. If one wants to compare with the original OpenFOAM solver, '*chemFoam*' solver with '*seulex*' selection must be set. Solver performances can also be compared with commercial software and other open-source software Cantera(https://www.cantera.org/).
+ - Change directory to '*sprayA_v12*'. Open '*constant/chemistryProperties*' file and see that ODE solver was set to '*seulexDNS*'. Recall that efficient dense solvers can be faster than sparse solvers for small size chemical mechanisms. Open '*system/controlDict*' file and see the '*solver mymulticomponentFluid;*' line. This is a custom library being called by '*foamRun*' solver. '*mymulticomponentFluid*' module is linked with custom *libchemistryModel.so,  liblagrangianParcel.so* and *libmyODE.so* libraries. Open '*system/decomposeParDict*' file and see the *simple* decomposer with 8 subdomains selection. If user's hardware does not have 8 physical cores, adjust accordingly. For testing purposes, try to use 8 processors. Open '*constant/cloudProperties*' and study the *injectionModels* key. See the *atomisationModel* was set to *blobInjection*. This is a custom implementation and plays crucial role to match with experimental liquid/vapor penetration. Secondary breakup model selection is *ReitzDiwakar*. Type '*Allrun-parallel*' and hit enter. OpenFOAM-v12 will sample the results using the input given in *functions* file in *system* directory. Simulation (8e-3 s) should take ~9000-10000 s with 8 processors. Check plots in *postGraphs* directory. There, reference results are from previous OpenFOAM-v9 simulation using CVODE and ATOL1e-20 and RTOL1e-12 tolerance settings.
+ - To visualize, hit '*foamToVTK*' command and use Paraview
 
 <div align="center">
 <img src="/sprayA.png" alt="Sandia Spray-A CFD RANS simulation" />
